@@ -1,0 +1,116 @@
+.gemini-organizer-container {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+  margin-bottom: 10px;
+  font-family: "Google Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+}
+
+.go-add-folder-btn {
+  background: transparent;
+  color: inherit;
+  border: 1px dashed rgba(128, 128, 128, 0.5);
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.go-add-folder-btn:hover {
+  background: rgba(128, 128, 128, 0.1);
+}
+
+.go-folder {
+  border: 1px solid rgba(128, 128, 128, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.1);
+  color: inherit;
+}
+
+.go-folder.drag-over {
+  border: 2px dashed #4285F4;
+  background: rgba(66, 133, 244, 0.1);
+}
+
+.go-folder-header {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  background: rgba(128, 128, 128, 0.05);
+  transition: background 0.2s;
+}
+
+.go-folder-header:hover {
+  background: rgba(128, 128, 128, 0.1);
+}
+
+.go-folder-chevron {
+  font-size: 10px;
+  margin-right: 8px;
+  transition: transform 0.2s ease;
+  opacity: 0.7;
+}
+
+.go-folder.expanded .go-folder-chevron {
+  transform: rotate(90deg);
+}
+
+.go-folder-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  margin-right: 8px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.go-folder-name {
+  flex-grow: 1;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  outline: none;
+}
+
+.go-folder-delete {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 16px;
+  opacity: 0.3;
+  transition: opacity 0.2s, color 0.2s;
+}
+
+.go-folder-delete:hover {
+  opacity: 1;
+  color: #ff5252;
+}
+
+.go-folder-content {
+  min-height: 10px;
+  display: none;
+  flex-direction: column;
+  padding-bottom: 5px;
+}
+
+.go-folder.expanded .go-folder-content {
+  display: flex;
+}
+
+.go-folder-content a {
+  margin-left: 15px !important; 
+  border-left: 2px solid rgba(128, 128, 128, 0.2);
+  border-radius: 0 !important;
+}
