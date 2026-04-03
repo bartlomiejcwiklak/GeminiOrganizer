@@ -2,7 +2,16 @@
 
 ## A simple extension for Chromium based browsers to organize your Gemini chats.
 
-### Features:
+### Features
 - Add color coded folders for your Gemini chats
 - Collapse folders to keep everything neat
 - Sync all changes into your Google account
+
+
+### Roadmap
+- Re-do the extension icon
+- Publish to Chrome Web Store
+
+
+### Credits
+Made by ohhbaro
