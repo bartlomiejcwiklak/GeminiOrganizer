@@ -2,6 +2,7 @@ let appState = {
   folders: []
 };
 
+// something is very fucked with the folder sync but idk what. works for now
 async function init() {
   try {
     if (chrome?.storage?.sync) {
