@@ -1,3 +1,7 @@
 icon.psd
 icon2.psd
 logo.psd
+.output/
+node_modules/
+.DS_Store
+.idea

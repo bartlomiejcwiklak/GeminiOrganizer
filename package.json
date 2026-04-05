@@ -1,0 +1,23 @@
+{
+  "name": "geminiorganizer",
+  "private": true,
+  "version": "1.0.1",
+  "type": "module",
+  "engines": {
+    "bun": ">=1.3.0"
+  },
+  "scripts": {
+    "build:dev": "bun run scripts/build.js dev",
+    "build:prod": "bun run scripts/build.js prod",
+    "build:firefox": "bun run scripts/build.js prod firefox-mv3",
+    "dev": "bun run scripts/watch.js",
+    "zip:chrome": "bun run scripts/zip.js chrome-mv3",
+    "zip:firefox": "bun run scripts/zip.js firefox-mv3",
+    "clean": "bun run scripts/clean.js"
+  },
+  "devDependencies": {
+    "archiver": "^7.0.1",
+    "clean-css": "^5.3.3",
+    "terser": "^5.31.0"
+  }
+}
