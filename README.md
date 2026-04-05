@@ -10,7 +10,7 @@ A feature **still** missing from the vanilla experience, yet present in its comp
 - Sync all changes into your Google account
   
 ### How to install
-1. **Download the Extension**: Download the provided .crx file from the Releases page.
+1. **Download the Extension**: [Download](https://github.com/bartlomiejcwiklak/GeminiOrganizer/releases) the provided .crx file from the Releases page.
 2. **Rename the File**: Right-click the .crx file, select Rename, and change the file extension from .crx to .zip.
    > If you can't see the file extension, you may need to enable "File name extensions" in your operating system's folder view settings.
 4. **Extract the Files**: Extract the newly renamed .zip file into a new, dedicated folder on your computer. Keep this folder somewhere safe, as deleting it will remove the extension from Chrome.
