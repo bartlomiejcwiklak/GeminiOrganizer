@@ -8,6 +8,16 @@ A feature **still** missing from the vanilla experience, yet present in its comp
 - Add color coded folders for your Gemini chats
 - Collapse folders to keep everything neat
 - Sync all changes into your Google account
+
+### Development (Bun)
+1. Install dependencies: `bun install`
+2. Build once: `bun run build:dev`
+3. Watch + rebuild: `bun run dev`
+4. Package ZIP for Chrome Web Store: `bun run zip:chrome`
+
+Optional (future Firefox target): `bun run build:firefox` and `bun run zip:firefox`.
+
+Build artifacts land in `.output/chrome-mv3/`. The pipeline is target-aware so adding a Firefox build later only requires a new target config and manifest transforms.
   
 ### How to install
 1. **Download the Extension**: [Download](https://github.com/bartlomiejcwiklak/GeminiOrganizer/releases) the provided .crx file from the Releases page.
