@@ -1,7 +1,7 @@
 <img width="2545" height="313" alt="logo3" src="https://github.com/user-attachments/assets/cdf8b61e-a795-45d3-9752-0515d2229789" />
 
 ### About
-Gemini Organizer is a browser extension for Chromium-based and Firefox browsers, enabling users to organize their Gemini chats.
+Gemini Organizer is a browser extension for Chromium and Firefox based browsers, enabling users to organize their Gemini chats.
 A feature **still** missing from the vanilla experience, yet present in its competitors (ChatGPT).
 
 ### Features
@@ -21,7 +21,6 @@ A feature **still** missing from the vanilla experience, yet present in its comp
 ```bash
 bun install
 ```
-
 2. Build for Chrome
 ```bash
 bun run build:chrome
@@ -41,12 +40,12 @@ bun run build:all
 - `bun run build:chrome` - create a Chrome/Chromium build
 - `bun run build:firefox` - create a Firefox/Firefox-based build
 - `bun run build:all` - build both browser targets
-- `bun run dev:chrome` - watch the Chrome build target
-- `bun run dev:firefox` - watch the Firefox build target
 - `bun run zip:chrome` - package the Chrome build as a zip
 - `bun run zip:firefox` - package the Firefox build as a zip
 - `bun run clean` - remove build output directories
 
+### Testing
+The extension was tested on Chrome, Helium, Firefox and Zen browsers, on both macOS and Windows.
 
 ### Roadmap
 - Preparing the extension for Chrome Web Store release: will make installation significantly easier
