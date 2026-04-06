@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "GeminiOrganizer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Organize your Gemini chats into custom color-coded folders.",
   "permissions": [
     "storage"
