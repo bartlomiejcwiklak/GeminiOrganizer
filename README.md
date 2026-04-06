@@ -10,9 +10,9 @@ A feature **still** missing from the vanilla experience, yet present in its comp
 - Sync all changes into your Google account
 
 ### How to use
-**Chrome:** `chrome://extensions/` → Developer Mode → Load unpacked → `.output/chrome-mv3/`
+**Chrome or Chromium-based browsers:** `chrome://extensions/` → Developer Mode → Load unpacked → `.output/chrome-mv3/`
 
-**Firefox:** `about:debugging#/runtime/this-firefox` → Load Temporary Add-on → `.output/firefox-mv3/manifest.json`
+**Firefox or Firefox-based browsers:** `about:debugging#/runtime/this-firefox` → Load Temporary Add-on → `.output/firefox-mv3/manifest.json`
 
 ### Build (using Bun)
 
@@ -21,18 +21,30 @@ A feature **still** missing from the vanilla experience, yet present in its comp
 bun install
 ```
 
-2. Build for your specific platform
+2. Build for Chrome
 ```bash
 bun run build:chrome
 ```
+3. Build for Firefox
 ```bash
 bun run build:firefox
 ```
-or build for both
+4. Build for both browsers
 ```bash
 bun run build:all 
 ```
 > Output: `.output/chrome-mv3/` and/or `.output/firefox-mv3/`
+
+### Available Commands
+
+- `bun run build:chrome` - create a Chrome/Chromium build
+- `bun run build:firefox` - create a Firefox/Firefox-based build
+- `bun run build:all` - build both browser targets
+- `bun run dev:chrome` - watch the Chrome build target
+- `bun run dev:firefox` - watch the Firefox build target
+- `bun run zip:chrome` - package the Chrome build as a zip
+- `bun run zip:firefox` - package the Firefox build as a zip
+- `bun run clean` - remove build output directories
 
 
 ### Roadmap

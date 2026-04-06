@@ -9,8 +9,12 @@
   "scripts": {
     "build:dev": "bun run scripts/build.js dev",
     "build:prod": "bun run scripts/build.js prod",
+    "build:chrome": "bun run scripts/build.js prod chrome-mv3",
     "build:firefox": "bun run scripts/build.js prod firefox-mv3",
+    "build:all": "bun run build:chrome && bun run build:firefox",
     "dev": "bun run scripts/watch.js",
+    "dev:chrome": "bun run scripts/watch.js chrome-mv3",
+    "dev:firefox": "bun run scripts/watch.js firefox-mv3",
     "zip:chrome": "bun run scripts/zip.js chrome-mv3",
     "zip:firefox": "bun run scripts/zip.js firefox-mv3",
     "clean": "bun run scripts/clean.js"

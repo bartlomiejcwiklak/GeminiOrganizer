@@ -9,6 +9,11 @@
   "host_permissions": [
     "*://gemini.google.com/*"
   ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "geminiorganizer@ohhbaro"
+    }
+  },
   "icons": {
     "16": "icon16.png",
     "32": "icon32.png",
