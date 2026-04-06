@@ -10,9 +10,10 @@ A feature **still** missing from the vanilla experience, yet present in its comp
 - Sync all changes into your Google account
 
 ### How to use
-**Chrome or Chromium-based browsers:** `chrome://extensions/` → Developer Mode → Load unpacked → `.output/chrome-mv3/`
-
-**Firefox or Firefox-based browsers:** `about:debugging#/runtime/this-firefox` → Load Temporary Add-on → `.output/firefox-mv3/manifest.json`
+[**Download**](https://github.com/bartlomiejcwiklak/GeminiOrganizer/releases) the extension for your desired browser type.
+   
+- **Chrome or Chromium-based browsers:** `chrome://extensions/` → Developer Mode → Load unpacked → `.output/chrome-mv3/`
+- **Firefox or Firefox-based browsers:** `about:debugging#/runtime/this-firefox` → Load Temporary Add-on → `.output/firefox-mv3/manifest.json`
 
 ### Build (using Bun)
 
@@ -29,7 +30,7 @@ bun run build:chrome
 ```bash
 bun run build:firefox
 ```
-4. Build for both browsers
+or build for both browsers
 ```bash
 bun run build:all 
 ```
