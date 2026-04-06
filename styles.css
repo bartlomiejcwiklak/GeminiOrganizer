@@ -1,27 +1,48 @@
 .gemini-organizer-container {
-  padding: 10px;
+  padding: 4px 10px 10px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   border-bottom: 1px solid rgba(128, 128, 128, 0.2);
   margin-bottom: 10px;
   font-family: "Google Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+  max-height: min(55vh, 460px);
+  overflow: auto;
 }
 
-.go-add-folder-btn {
+.gemini-organizer-container.go-main-drop-active {
+  outline: 1px dashed rgba(66, 133, 244, 0.55);
+  outline-offset: 2px;
+}
+
+.go-chats-header-anchor {
+  position: relative;
+}
+
+.go-add-folder-icon {
   background: transparent;
   color: inherit;
   border: 1px dashed rgba(128, 128, 128, 0.5);
-  padding: 8px;
-  border-radius: 8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
-  font-weight: 500;
-  font-size: 13px;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
 }
 
-.go-add-folder-btn:hover {
+.go-add-folder-icon:hover {
   background: rgba(128, 128, 128, 0.1);
 }
 
@@ -45,6 +66,7 @@
   cursor: pointer;
   background: rgba(128, 128, 128, 0.05);
   transition: background 0.2s;
+  gap: 8px;
 }
 
 .go-folder-header:hover {
@@ -63,13 +85,32 @@
 }
 
 .go-folder-color {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  margin-right: 8px;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
   border: none;
   padding: 0;
+}
+
+.go-folder-color-wrap {
+  position: relative;
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.go-folder-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 0;
+  margin: 0;
   cursor: pointer;
+  display: block;
 }
 
 .go-folder-name {
@@ -81,6 +122,7 @@
   font-size: 14px;
   font-weight: 500;
   outline: none;
+  min-width: 0;
 }
 
 .go-folder-delete {
@@ -98,6 +140,25 @@
   color: #ff5252;
 }
 
+.go-folder-add-sub {
+  background: transparent;
+  border: 1px solid rgba(128, 128, 128, 0.35);
+  color: inherit;
+  cursor: pointer;
+  font-size: 13px;
+  width: 18px;
+  height: 18px;
+  line-height: 1;
+  border-radius: 5px;
+  opacity: 0.7;
+  margin-right: 6px;
+}
+
+.go-folder-add-sub:hover {
+  opacity: 1;
+  background: rgba(128, 128, 128, 0.12);
+}
+
 .go-folder-content {
   min-height: 10px;
   display: none;
@@ -105,8 +166,19 @@
   padding-bottom: 5px;
 }
 
-.go-folder.expanded .go-folder-content {
+.go-folder.expanded > .go-folder-content {
   display: flex;
+}
+
+.go-subfolders {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.go-subfolders > .go-folder {
+  margin-left: 12px;
 }
 
 .go-folder-content a {

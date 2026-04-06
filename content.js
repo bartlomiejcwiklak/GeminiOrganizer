@@ -2,6 +2,77 @@ let appState = {
   folders: []
 };
 
+let domSyncScheduled = false;
+
+function createFolderObject(name = 'New Folder') {
+  return {
+    id: 'folder_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+    name,
+    color: '#4285F4',
+    isExpanded: true,
+    chats: [],
+    subfolders: []
+  };
+}
+
+function normalizeFolder(folder) {
+  return {
+    id: folder?.id || 'folder_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+    name: folder?.name || 'New Folder',
+    color: folder?.color || '#4285F4',
+    isExpanded: folder?.isExpanded !== false,
+    chats: Array.isArray(folder?.chats) ? folder.chats : [],
+    subfolders: Array.isArray(folder?.subfolders)
+      ? folder.subfolders.map(normalizeFolder)
+      : []
+  };
+}
+
+function normalizeStateFolders() {
+  appState.folders = Array.isArray(appState.folders)
+    ? appState.folders.map(normalizeFolder)
+    : [];
+}
+
+function removeChatFromFolders(chatHref, folders = appState.folders) {
+  folders.forEach(folder => {
+    folder.chats = folder.chats.filter(href => href !== chatHref);
+    removeChatFromFolders(chatHref, folder.subfolders);
+  });
+}
+
+function findFolderContainingChat(chatHref, folders = appState.folders) {
+  for (const folder of folders) {
+    if (folder.chats.includes(chatHref)) {
+      return folder;
+    }
+
+    const subfolderMatch = findFolderContainingChat(chatHref, folder.subfolders);
+    if (subfolderMatch) {
+      return subfolderMatch;
+    }
+  }
+
+  return null;
+}
+
+function removeFolderById(folderId, folders = appState.folders) {
+  for (let i = folders.length - 1; i >= 0; i -= 1) {
+    const folder = folders[i];
+
+    if (folder.id === folderId) {
+      folders.splice(i, 1);
+      return true;
+    }
+
+    if (removeFolderById(folderId, folder.subfolders)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 // something is very fucked with the folder sync but idk what. works for now
 async function init() {
   try {
@@ -25,6 +96,7 @@ async function init() {
   } catch (error) {
     console.warn("Storage error. Starting fresh.");
   }
+  normalizeStateFolders();
   observeDOM();
 }
 
@@ -38,7 +110,7 @@ function saveState() {
 }
 
 function observeDOM() {
-  const observer = new MutationObserver(() => {
+  const syncSidebarUI = () => {
     const allChatLinks = Array.from(document.querySelectorAll('a[href*="/app/"]'));
     
     const sidebarLinks = allChatLinks.filter(link => {
@@ -61,12 +133,26 @@ function observeDOM() {
       if (listContainer && !document.getElementById('gemini-organizer-root')) {
         injectUI(listContainer);
       } else if (listContainer) {
+        ensureChatsHeaderButton();
         organizeChats();
       }
     }
+  };
+
+  const observer = new MutationObserver(() => {
+    if (domSyncScheduled) {
+      return;
+    }
+
+    domSyncScheduled = true;
+    requestAnimationFrame(() => {
+      domSyncScheduled = false;
+      syncSidebarUI();
+    });
   });
 
   observer.observe(document.body, { childList: true, subtree: true });
+  syncSidebarUI();
 }
 
 function injectUI(listContainer) {
@@ -74,26 +160,128 @@ function injectUI(listContainer) {
   root.id = 'gemini-organizer-root';
   root.className = 'gemini-organizer-container';
 
-  const addBtn = document.createElement('button');
-  addBtn.innerText = '+ New Folder'; 
-  addBtn.className = 'go-add-folder-btn';
-  addBtn.onclick = createFolder;
-
-  root.appendChild(addBtn);
   listContainer.prepend(root);
 
+  setupMainListDropTarget(listContainer);
+  ensureChatsHeaderButton();
   renderFolders();
 }
 
+function setupMainListDropTarget(listContainer) {
+  if (!listContainer || listContainer.dataset.goMainDropReady === '1') {
+    return;
+  }
+
+  listContainer.dataset.goMainDropReady = '1';
+
+  listContainer.addEventListener('dragover', (e) => {
+    if (e.target.closest('.go-folder')) {
+      return;
+    }
+
+    e.preventDefault();
+    const root = document.getElementById('gemini-organizer-root');
+    if (root) {
+      root.classList.add('go-main-drop-active');
+    }
+  });
+
+  listContainer.addEventListener('dragleave', (e) => {
+    const relatedTarget = e.relatedTarget;
+    if (relatedTarget && listContainer.contains(relatedTarget)) {
+      return;
+    }
+
+    const root = document.getElementById('gemini-organizer-root');
+    if (root) {
+      root.classList.remove('go-main-drop-active');
+    }
+  });
+
+  listContainer.addEventListener('drop', (e) => {
+    const root = document.getElementById('gemini-organizer-root');
+    if (root) {
+      root.classList.remove('go-main-drop-active');
+    }
+
+    if (e.target.closest('.go-folder')) {
+      return;
+    }
+
+    const chatHref = e.dataTransfer.getData('text/plain');
+    if (!chatHref) {
+      return;
+    }
+
+    e.preventDefault();
+    removeChatFromFolders(chatHref);
+    saveState();
+    renderFolders();
+  });
+}
+
+function findChatsHeaderElement() {
+  const textCandidates = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, div, span, p'));
+
+  return textCandidates.find(el => {
+    if (!el) {
+      return false;
+    }
+
+    const text = (el.textContent || '').replace(/\s+/g, ' ').trim();
+    if (!text || text.length > 30) {
+      return false;
+    }
+
+    return /^(Chats|Czaty)(\s*\(\d+\))?$/i.test(text);
+  }) || null;
+}
+
+function ensureChatsHeaderButton() {
+  const chatsHeader = findChatsHeaderElement();
+  if (!chatsHeader || !chatsHeader.parentElement) {
+    return;
+  }
+
+  let headerContainer = chatsHeader.parentElement;
+  const parentRect = headerContainer.getBoundingClientRect();
+  if (parentRect.height > 120) {
+    headerContainer = chatsHeader;
+  }
+
+  headerContainer.classList.add('go-chats-header-anchor');
+
+  const existingButton = document.getElementById('gemini-organizer-add-btn');
+  if (existingButton && existingButton.parentElement === headerContainer) {
+    return;
+  }
+
+  if (existingButton) {
+    existingButton.remove();
+  }
+
+  const addBtn = document.createElement('button');
+  addBtn.id = 'gemini-organizer-add-btn';
+  addBtn.className = 'go-add-folder-icon';
+  addBtn.type = 'button';
+  addBtn.innerText = '+';
+  addBtn.title = 'Create folder';
+  addBtn.setAttribute('aria-label', 'Create folder');
+  addBtn.onclick = createFolder;
+
+  headerContainer.appendChild(addBtn);
+}
+
 function createFolder() {
-  const newFolder = {
-    id: 'folder_' + Date.now(),
-    name: 'New Folder',
-    color: '#4285F4',
-    isExpanded: true,
-    chats: []
-  };
+  const newFolder = createFolderObject();
   appState.folders.push(newFolder);
+  saveState();
+  renderFolders();
+}
+
+function createSubFolder(parentFolder) {
+  parentFolder.subfolders.push(createFolderObject('New Sub-folder'));
+  parentFolder.isExpanded = true;
   saveState();
   renderFolders();
 }
@@ -112,7 +300,13 @@ function renderFolders() {
     f.remove();
   });
 
-  appState.folders.forEach(folderData => {
+  renderFolderTree(appState.folders, root, 0);
+
+  organizeChats();
+}
+
+function renderFolderTree(folders, parentElement, depth) {
+  folders.forEach(folderData => {
     const folderEl = document.createElement('div');
     folderEl.className = `go-folder ${folderData.isExpanded ? 'expanded' : ''}`;
     folderEl.dataset.id = folderData.id;
@@ -134,9 +328,27 @@ function renderFolders() {
     colorPicker.type = 'color';
     colorPicker.className = 'go-folder-color';
     colorPicker.value = folderData.color;
+
+    const colorDot = document.createElement('button');
+    colorDot.type = 'button';
+    colorDot.className = 'go-folder-dot';
+    colorDot.title = 'Change folder color';
+    colorDot.style.backgroundColor = folderData.color;
+
+    const colorWrap = document.createElement('div');
+    colorWrap.className = 'go-folder-color-wrap';
+    colorWrap.onclick = (e) => e.stopPropagation();
+
     colorPicker.onclick = (e) => e.stopPropagation();
+    colorPicker.oninput = (e) => {
+      folderData.color = e.target.value;
+      colorDot.style.backgroundColor = folderData.color;
+      saveState();
+    };
+
     colorPicker.onchange = (e) => {
       folderData.color = e.target.value;
+      colorDot.style.backgroundColor = folderData.color;
       saveState();
     };
 
@@ -157,42 +369,63 @@ function renderFolders() {
     delBtn.onclick = (e) => {
       e.stopPropagation();
       if (confirm('Delete this folder? (Chats will return to the main list)')) {
-        appState.folders = appState.folders.filter(f => f.id !== folderData.id);
+        removeFolderById(folderData.id);
         saveState();
         renderFolders();
       }
     };
 
+    const addSubBtn = document.createElement('button');
+    addSubBtn.innerText = '+';
+    addSubBtn.className = 'go-folder-add-sub';
+    addSubBtn.title = 'Create sub-folder';
+    addSubBtn.onclick = (e) => {
+      e.stopPropagation();
+      createSubFolder(folderData);
+    };
+
     header.appendChild(chevron);
-    header.appendChild(colorPicker);
+    colorWrap.appendChild(colorDot);
+    colorWrap.appendChild(colorPicker);
+    header.appendChild(colorWrap);
     header.appendChild(nameInput);
+    header.appendChild(addSubBtn);
     header.appendChild(delBtn);
 
     const content = document.createElement('div');
     content.className = 'go-folder-content';
+
+    const subfolders = document.createElement('div');
+    subfolders.className = 'go-subfolders';
     
     setupDragAndDrop(folderEl, folderData, content);
 
+    content.appendChild(subfolders);
     folderEl.appendChild(header);
     folderEl.appendChild(content);
-    root.appendChild(folderEl);
-  });
+    parentElement.appendChild(folderEl);
 
-  organizeChats();
+    if (folderData.subfolders.length > 0) {
+      renderFolderTree(folderData.subfolders, subfolders, depth + 1);
+    }
+  });
 }
 
 function setupDragAndDrop(folderEl, folderData, content) {
   folderEl.addEventListener('dragover', (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
+    e.stopPropagation();
     folderEl.classList.add('drag-over');
   });
 
-  folderEl.addEventListener('dragleave', () => {
+  folderEl.addEventListener('dragleave', (e) => {
+    e.stopPropagation();
     folderEl.classList.remove('drag-over');
   });
 
   folderEl.addEventListener('drop', (e) => {
     e.preventDefault();
+    e.stopPropagation();
     folderEl.classList.remove('drag-over');
     
     folderData.isExpanded = true; 
@@ -200,9 +433,7 @@ function setupDragAndDrop(folderEl, folderData, content) {
     const chatHref = e.dataTransfer.getData('text/plain');
     
     if (chatHref) {
-      appState.folders.forEach(f => {
-        f.chats = f.chats.filter(href => href !== chatHref);
-      });
+      removeChatFromFolders(chatHref);
       
       if (!folderData.chats.includes(chatHref)) {
         folderData.chats.push(chatHref);
@@ -228,7 +459,7 @@ function organizeChats() {
       e.dataTransfer.setData('text/plain', href);
     };
 
-    const targetFolder = appState.folders.find(f => f.chats.includes(href));
+    const targetFolder = findFolderContainingChat(href);
     
     if (targetFolder) {
       const folderContentArea = document.querySelector(`.go-folder[data-id="${targetFolder.id}"] .go-folder-content`);
